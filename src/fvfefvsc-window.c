@@ -21,7 +21,6 @@
 #include "config.h"
 
 #include "fvfefvsc-window.h"
-#include "fvfefvsc-actions.c"
 
 
 G_DEFINE_FINAL_TYPE (FvfefvscWindow, fvfefvsc_window, ADW_TYPE_APPLICATION_WINDOW)

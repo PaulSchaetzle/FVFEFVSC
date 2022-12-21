@@ -39,4 +39,6 @@ struct _FvfefvscWindow
   GtkTextBuffer       *text_buffer;
 };
 
+void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
+
 G_END_DECLS
