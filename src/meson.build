@@ -2,6 +2,7 @@ fvfefvsc_sources = [
   'main.c',
   'fvfefvsc-application.c',
   'fvfefvsc-window.c',
+  'fvfefvsc-actions.c',
 ]
 
 fvfefvsc_deps = [

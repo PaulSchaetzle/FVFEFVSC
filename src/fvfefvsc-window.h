@@ -28,4 +28,15 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FvfefvscWindow, fvfefvsc_window, FVFEFVSC, WINDOW, AdwApplicationWindow)
 
+struct _FvfefvscWindow
+{
+  AdwApplicationWindow  parent_instance;
+
+  /* Template widgets */
+  GtkHeaderBar        *header_bar;
+  GtkLabel            *label;
+  GtkTextView         *text_view;
+  GtkTextBuffer       *text_buffer;
+};
+
 G_END_DECLS
