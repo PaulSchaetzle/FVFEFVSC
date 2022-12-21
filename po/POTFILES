@@ -1,0 +1,6 @@
+data/xyz.schaetzle.fvfefvsc.desktop.in
+data/xyz.schaetzle.fvfefvsc.appdata.xml.in
+data/xyz.schaetzle.fvfefvsc.gschema.xml
+src/main.c
+src/fvfefvsc-window.c
+src/fvfefvsc-window.ui

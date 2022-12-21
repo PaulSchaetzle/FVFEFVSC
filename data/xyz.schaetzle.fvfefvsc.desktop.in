@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=fvfefvsc
+Exec=fvfefvsc
+Icon=xyz.schaetzle.fvfefvsc
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true
