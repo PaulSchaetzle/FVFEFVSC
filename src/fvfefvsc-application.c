@@ -71,7 +71,7 @@ fvfefvsc_application_about_action (GSimpleAction *action,
                                    GVariant      *parameter,
                                    gpointer       user_data)
 {
-  static const char *developers[] = {"1000len-6578", NULL};
+  static const char *developers[] = {"Paul Schätzle", NULL};
   FvfefvscApplication *self = user_data;
   GtkWindow *window = NULL;
 
@@ -82,10 +82,10 @@ fvfefvsc_application_about_action (GSimpleAction *action,
   adw_show_about_window (window,
                          "application-name", "fvfefvsc",
                          "application-icon", "xyz.schaetzle.fvfefvsc",
-                         "developer-name", "1000len-6578",
+                         "developer-name", "Paul Schätzle",
                          "version", "0.1.0",
                          "developers", developers,
-                         "copyright", "© 2022 1000len-6578",
+                         "copyright", "© 2022 Paul Schätzle",
                          NULL);
 }
 

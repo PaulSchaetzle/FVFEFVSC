@@ -38,6 +38,15 @@ action_open (GtkWidget *widget, const char *action_name, GVariant *param)
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
 
+static void
+action_save (GtkWidget *widget,
+             const char *action_name,
+             GVariant   *param)
+{
+  FvfefvscWindow *self = (FvfefvscWindow*) widget;
+
+}
+
 void
 _fvfefvsc_window_class_actions_init(FvfefvscWindowClass *klass)
 {
@@ -47,4 +56,9 @@ _fvfefvsc_window_class_actions_init(FvfefvscWindowClass *klass)
                                   "win.open",
                                   NULL,
                                   action_open);
+
+  gtk_widget_class_install_action (widget_class,
+                                  "win.save",
+                                  NULL,
+                                  action_save);
 }
