@@ -1,4 +1,4 @@
-/* fvfefvsc-window.h
+/* fvfefvsc-page.h
  *
  * Copyright 2022 Paul Schaetzle
  *
@@ -22,25 +22,26 @@
 
 #include <adwaita.h>
 
-#include "fvfefvsc-page.h"
-
 G_BEGIN_DECLS
 
-#define FVFEFVSC_TYPE_WINDOW (fvfefvsc_window_get_type())
+#define FVFEFVSC_TYPE_PAGE (fvfefvsc_page_get_type())
 
-G_DECLARE_FINAL_TYPE (FvfefvscWindow, fvfefvsc_window, FVFEFVSC, WINDOW, AdwApplicationWindow)
+G_DECLARE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, FVFEFVSC, WIDGET, GtkWidget)
 
-struct _FvfefvscWindow
+struct _FvfefvscPage
 {
-  AdwApplicationWindow  parent_instance;
+  GtkWidget           parent_instance;
 
   /* Template widgets */
-  GtkHeaderBar        *header_bar;
-  AdwTabView          *tab_view;
-  AdwTabBar           *tab_bar;
-  FvfefvscPage        *visible_page;
+  GtkWidget           *box;
+  GtkScrolledWindow   *scroller;
+  GtkTextView         *text_view;
+  GtkTextBuffer       *text_buffer;
+  gchar               *file_name;
+  gchar               *title;
 };
 
-void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
+void load_file(FvfefvscPage *self, GFile *file);
+FvfefvscPage * fvfefvsc_new_page(void);
 
 G_END_DECLS

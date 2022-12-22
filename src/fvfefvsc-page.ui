@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="FvfefvscPage" parent="GtkWidget">
+    <child>
+      <object class="GtkBox" id="box">
+        <property name="orientation">vertical</property>
+          <child>
+            <object class="GtkScrolledWindow" id="scroller">
+              <property name="hexpand">true</property>
+              <property name="vexpand">true</property>
+                <child>
+                  <object class="GtkTextView" id="text_view">
+                  </object>
+                </child>
+            </object>
+          </child>
+      </object>
+    </child>
+  </template>
+</interface>

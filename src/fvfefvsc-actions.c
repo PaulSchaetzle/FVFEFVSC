@@ -2,26 +2,21 @@
 
 #include "fvfefvsc-window.h"
 
-void
-load_file(FvfefvscWindow *self, GFile *file)
-{
-  gchar* path_name;
-  gchar* file_buffer;
-  path_name = g_file_get_path(file);
-  g_file_get_contents (path_name, &file_buffer, NULL, NULL);
-  self->text_buffer = gtk_text_view_get_buffer(self->text_view);
-  gtk_text_buffer_set_text(self->text_buffer, file_buffer, -1);
-}
-
 static void
 action_open_response(FvfefvscWindow *self, int response, GtkFileChooserNative *native)
 {
  if (response == GTK_RESPONSE_ACCEPT)
     {
+      AdwTabPage *tab_page;
+      self->visible_page = fvfefvsc_new_page ();
       GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
-      load_file(self, file);
+      load_file(self->visible_page, file);
       g_object_unref (file);
+      tab_page = adw_tab_view_add_page(self->tab_view, GTK_WIDGET(self->visible_page), NULL);
+      adw_tab_page_set_title(tab_page, self->visible_page->file_name);
     }
+
+    gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
 }
 
 static void

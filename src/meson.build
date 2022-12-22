@@ -3,6 +3,7 @@ fvfefvsc_sources = [
   'fvfefvsc-application.c',
   'fvfefvsc-window.c',
   'fvfefvsc-actions.c',
+  'fvfefvsc-page.c',
 ]
 
 fvfefvsc_deps = [

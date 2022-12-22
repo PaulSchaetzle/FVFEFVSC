@@ -31,17 +31,9 @@
         </child>
         <child>
           <object class="AdwTabView" id="tab_view">
-           <child>
-            <object class="GtkScrolledWindow" id="scroller">
-              <property name="hexpand">true</property>
-                <property name="vexpand">true</property>
-                  <child>
-                    <object class="GtkTextView" id="text_view">
-                    </object>
-                  </child>
-                </object>
-           </child>
-           </object>
+            <property name="hexpand">true</property>
+            <property name="vexpand">true</property>
+          </object>
         </child>
       </object>
     </child>
