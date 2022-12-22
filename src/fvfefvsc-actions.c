@@ -18,7 +18,7 @@ action_open_response(FvfefvscWindow *self, int response, GtkFileChooserNative *n
 {
  if (response == GTK_RESPONSE_ACCEPT)
     {
-      GFile *file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
+      GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
       load_file(self, file);
       g_object_unref (file);
     }

@@ -34,7 +34,8 @@ struct _FvfefvscWindow
 
   /* Template widgets */
   GtkHeaderBar        *header_bar;
-  GtkLabel            *label;
+  AdwTabView          *tab_view;
+  AdwTabBar           *tab_bar;
   GtkTextView         *text_view;
   GtkTextBuffer       *text_buffer;
 };
