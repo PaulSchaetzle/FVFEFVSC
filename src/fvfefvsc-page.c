@@ -48,13 +48,13 @@ save_file (FvfefvscPage* self)
   GtkTextBuffer *buffer;
   gboolean result;
   gchar *text;
-  GtkTextIter *start;
-  GtkTextIter *end;
+  GtkTextIter start;
+  GtkTextIter end;
 
   buffer = self->text_buffer;
-  gtk_text_buffer_get_start_iter (buffer, start);
-  gtk_text_buffer_get_end_iter (buffer, end);
-  text = gtk_text_buffer_get_text (buffer, start, end, false);
+  gtk_text_buffer_get_start_iter (buffer, &start);
+  gtk_text_buffer_get_end_iter (buffer, &end);
+  text = gtk_text_buffer_get_text (buffer, &start, &end, false);
   result = g_file_set_contents (self->file_name, text, -1, NULL);
 }
 

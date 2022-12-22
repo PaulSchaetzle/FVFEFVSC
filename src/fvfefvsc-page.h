@@ -42,7 +42,7 @@ struct _FvfefvscPage
 };
 
 void load_file(FvfefvscPage *self, GFile *file);
-void save_fiel(FvfefvscPage* self);
+void save_file(FvfefvscPage* self);
 FvfefvscPage * fvfefvsc_new_page(void);
 
 G_END_DECLS

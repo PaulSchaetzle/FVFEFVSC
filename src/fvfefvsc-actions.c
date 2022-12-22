@@ -39,7 +39,7 @@ action_save (GtkWidget *widget,
              GVariant   *param)
 {
   FvfefvscWindow *self = (FvfefvscWindow*) widget;
-
+  save_file(self->visible_page);
 }
 
 void
