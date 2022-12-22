@@ -26,20 +26,36 @@
 G_DEFINE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, GTK_TYPE_WIDGET)
 
 FvfefvscPage *
-fvfefvsc_new_page(void)
+fvfefvsc_new_page (void)
 {
   return g_object_new(FVFEFVSC_TYPE_PAGE,
                       NULL);
 }
 
 void
-load_file(FvfefvscPage *self, GFile *file)
+load_file (FvfefvscPage *self, GFile *file)
 {
   gchar* file_buffer;
   self->file_name = g_file_get_path(file);
   g_file_get_contents (self->file_name, &file_buffer, NULL, NULL);
   self->text_buffer = gtk_text_view_get_buffer(self->text_view);
   gtk_text_buffer_set_text(self->text_buffer, file_buffer, -1);
+}
+
+void
+save_file (FvfefvscPage* self)
+{
+  GtkTextBuffer *buffer;
+  gboolean result;
+  gchar *text;
+  GtkTextIter *start;
+  GtkTextIter *end;
+
+  buffer = self->text_buffer;
+  gtk_text_buffer_get_start_iter (buffer, start);
+  gtk_text_buffer_get_end_iter (buffer, end);
+  text = gtk_text_buffer_get_text (buffer, start, end, false);
+  result = g_file_set_contents (self->file_name, text, -1, NULL);
 }
 
 static void
