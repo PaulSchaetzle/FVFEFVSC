@@ -22,6 +22,12 @@
 
 #include "fvfefvsc-page.h"
 
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 G_DEFINE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, GTK_TYPE_WIDGET)
 
 FvfefvscPage *
@@ -35,8 +41,8 @@ void
 load_file (FvfefvscPage *self, GFile *file)
 {
   gchar* file_buffer;
-  self->file_name = g_file_get_path(file);
-  g_file_get_contents (self->file_name, &file_buffer, NULL, NULL);
+  self->file_path = g_file_get_path(file);
+  g_file_get_contents (self->file_path, &file_buffer, NULL, NULL);
   gtk_text_buffer_set_text((GtkTextBuffer *)self->source_buffer, file_buffer, -1);
 }
 
@@ -48,11 +54,22 @@ save_file (FvfefvscPage* self)
   gchar *text;
   GtkTextIter start;
   GtkTextIter end;
+  mode_t file_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 
+  if (!g_file_test(self->file_path, G_FILE_TEST_EXISTS))
+  {
+    g_creat(self->file_path, file_mode);
+  }
   gtk_text_buffer_get_start_iter (buffer, &start);
   gtk_text_buffer_get_end_iter (buffer, &end);
   text = gtk_text_buffer_get_text (buffer, &start, &end, false);
-  result = g_file_set_contents (self->file_name, text, -1, NULL);
+  result = g_file_set_contents (self->file_path, text, -1, NULL);
+}
+
+void
+set_filepath(FvfefvscPage *self, gchar *file_path)
+{
+  self->file_path = file_path;
 }
 
 static void

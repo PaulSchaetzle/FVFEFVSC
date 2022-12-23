@@ -41,6 +41,8 @@ fvfefvsc_window_class_init (FvfefvscWindowClass *klass)
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_s, GDK_CONTROL_MASK, "win.save", NULL);
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_n, GDK_CONTROL_MASK, "win.new", NULL);
 
+  g_type_ensure(FVFEFVSC_TYPE_PAGE);
+
   _fvfefvsc_window_class_actions_init (klass);  // intialize fvfefvsc-actions
 }
 

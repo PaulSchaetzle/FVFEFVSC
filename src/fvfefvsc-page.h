@@ -38,12 +38,13 @@ struct _FvfefvscPage
   GtkScrolledWindow   *scroller;
   GtkSourceView       *source_view;
   GtkSourceBuffer     *source_buffer;
-  gchar               *file_name;
+  gchar               *file_path;
   gchar               *title;
 };
 
 void load_file(FvfefvscPage *self, GFile *file);
 void save_file(FvfefvscPage* self);
+void set_filepath(FvfefvscPage *self, gchar* file_path);
 FvfefvscPage * fvfefvsc_page_new(void);
 static void fvfefvsc_page_dispose (GObject *object);
 
