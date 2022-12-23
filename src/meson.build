@@ -9,6 +9,7 @@ fvfefvsc_sources = [
 fvfefvsc_deps = [
   dependency('gtk4'),
   dependency('libadwaita-1'),
+  dependency('gtksourceview-5'),
 ]
 
 fvfefvsc_sources += gnome.compile_resources('fvfefvsc-resources',

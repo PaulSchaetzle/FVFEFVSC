@@ -8,7 +8,7 @@ action_open_response(FvfefvscWindow *self, int response, GtkFileChooserNative *n
  if (response == GTK_RESPONSE_ACCEPT)
     {
       AdwTabPage *tab_page;
-      self->visible_page = fvfefvsc_new_page ();
+      self->visible_page = fvfefvsc_page_new ();
       GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
       load_file(self->visible_page, file);
       g_object_unref (file);
@@ -42,6 +42,18 @@ action_save (GtkWidget *widget,
   save_file(self->visible_page);
 }
 
+static void
+action_new (GtkWidget *widget,
+            const char *action_name,
+            GVariant *param)
+{
+  FvfefvscWindow *self = FVFEFVSC_WINDOW (widget);
+  AdwTabPage *tab_page;
+  self->visible_page = fvfefvsc_page_new ();
+  tab_page = adw_tab_view_add_page(self->tab_view, GTK_WIDGET(self->visible_page), NULL);
+  adw_tab_page_set_title(tab_page, "New Document");
+}
+
 void
 _fvfefvsc_window_class_actions_init(FvfefvscWindowClass *klass)
 {
@@ -56,4 +68,9 @@ _fvfefvsc_window_class_actions_init(FvfefvscWindowClass *klass)
                                   "win.save",
                                   NULL,
                                   action_save);
+
+  gtk_widget_class_install_action (widget_class,
+                                  "win.new",
+                                  NULL,
+                                  action_new);
 }

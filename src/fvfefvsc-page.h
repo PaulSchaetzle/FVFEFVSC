@@ -21,6 +21,7 @@
 #pragma once
 
 #include <adwaita.h>
+#include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
 
@@ -35,14 +36,15 @@ struct _FvfefvscPage
   /* Template widgets */
   GtkWidget           *box;
   GtkScrolledWindow   *scroller;
-  GtkTextView         *text_view;
-  GtkTextBuffer       *text_buffer;
+  GtkSourceView       *source_view;
+  GtkSourceBuffer     *source_buffer;
   gchar               *file_name;
   gchar               *title;
 };
 
 void load_file(FvfefvscPage *self, GFile *file);
 void save_file(FvfefvscPage* self);
-FvfefvscPage * fvfefvsc_new_page(void);
+FvfefvscPage * fvfefvsc_page_new(void);
+static void fvfefvsc_page_dispose (GObject *object);
 
 G_END_DECLS
