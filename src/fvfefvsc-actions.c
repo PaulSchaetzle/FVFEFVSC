@@ -21,8 +21,8 @@ action_open_response(FvfefvscWindow *self, int response, GtkFileChooserNative *n
       GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
       load_file(self->visible_page, file);
       g_object_unref (file);
-      tab_page = adw_tab_view_add_page(self->tab_view, GTK_WIDGET(self->visible_page), NULL);
-      adw_tab_page_set_title(tab_page, self->visible_page->file_path);
+      tab_page = adw_tab_view_append(self->tab_view, GTK_WIDGET(self->visible_page));
+      adw_tab_page_set_title(tab_page, self->visible_page->title);
     }
 
     gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
@@ -35,13 +35,16 @@ action_save_as_response(FvfefvscWindow *self, int response, GtkFileChooserNative
     {
       GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
       set_filepath (self->visible_page, g_file_get_path(file));
+      save_file(self->visible_page);
       g_object_unref (file);
     }
     gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
 }
 
 static void
-action_open (GtkWidget *widget, const char *action_name, GVariant *param)
+action_open (GtkWidget *widget,
+             const char *action_name,
+             GVariant *param)
 {
   FvfefvscWindow *self = (FvfefvscWindow*) widget;
   GtkFileChooserNative *native;
@@ -56,8 +59,8 @@ action_open (GtkWidget *widget, const char *action_name, GVariant *param)
 
 static void
 action_save_as (GtkWidget *widget,
-             const char *action_name,
-             GVariant   *param)
+                const char *action_name,
+                GVariant   *param)
 {
   FvfefvscWindow *self = (FvfefvscWindow*) widget;
   GtkFileChooserNative *native;
@@ -78,7 +81,7 @@ action_new (GtkWidget *widget,
   FvfefvscWindow *self = FVFEFVSC_WINDOW (widget);
   AdwTabPage *tab_page;
   self->visible_page = fvfefvsc_page_new ();
-  tab_page = adw_tab_view_add_page(self->tab_view, GTK_WIDGET(self->visible_page), NULL);
+  tab_page = adw_tab_view_append(self->tab_view, GTK_WIDGET(self->visible_page));
   adw_tab_page_set_title(tab_page, "New Document");
 }
 

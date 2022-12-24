@@ -46,6 +46,8 @@ void load_file(FvfefvscPage *self, GFile *file);
 void save_file(FvfefvscPage* self);
 void set_filepath(FvfefvscPage *self, gchar* file_path);
 FvfefvscPage * fvfefvsc_page_new(void);
+
 static void fvfefvsc_page_dispose (GObject *object);
+
 
 G_END_DECLS

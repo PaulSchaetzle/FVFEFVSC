@@ -40,30 +40,31 @@ fvfefvsc_page_new (void)
 void
 load_file (FvfefvscPage *self, GFile *file)
 {
-  gchar* file_buffer;
-  self->file_path = g_file_get_path(file);
-  g_file_get_contents (self->file_path, &file_buffer, NULL, NULL);
-  gtk_text_buffer_set_text((GtkTextBuffer *)self->source_buffer, file_buffer, -1);
+  gchar *file_buffer;
+  gchar *title;
+  gchar *file_path;
+  GtkTextBuffer *source_buffer = (GtkTextBuffer *) self->source_buffer;
+
+  file_path = g_file_get_path(file);
+  title = g_file_get_basename (file);
+  self->file_path = file_path;
+  self->title = title;
+  g_file_get_contents (file_path, &file_buffer, NULL, NULL);
+  gtk_text_buffer_set_text(source_buffer, file_buffer, -1);
 }
 
 void
 save_file (FvfefvscPage* self)
 {
   GtkTextBuffer *buffer = (GtkTextBuffer *) self->source_buffer;
-  gboolean result;
   gchar *text;
   GtkTextIter start;
   GtkTextIter end;
-  mode_t file_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 
-  if (!g_file_test(self->file_path, G_FILE_TEST_EXISTS))
-  {
-    g_creat(self->file_path, file_mode);
-  }
   gtk_text_buffer_get_start_iter (buffer, &start);
   gtk_text_buffer_get_end_iter (buffer, &end);
   text = gtk_text_buffer_get_text (buffer, &start, &end, false);
-  result = g_file_set_contents (self->file_path, text, -1, NULL);
+  g_file_set_contents (self->file_path, text, -1, NULL);
 }
 
 void
