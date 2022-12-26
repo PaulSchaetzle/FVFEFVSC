@@ -44,7 +44,11 @@ struct _FvfefvscWindow
   AdwStatusPage       *welcome_page;
 };
 
-void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
+// Callbacks
 static void show_pages(FvfefvscWindow *self);
+static void update_window (FvfefvscWindow *self);
+
+// Fvfefvsc-actions constructor call
+void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
 
 G_END_DECLS

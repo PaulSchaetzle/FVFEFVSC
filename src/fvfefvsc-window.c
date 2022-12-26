@@ -30,7 +30,7 @@ fvfefvsc_window_class_init (FvfefvscWindowClass *klass)
 {
 
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  GtkWindowClass *window_calss = GTK_WINDOW_CLASS (klass);
+  // GtkWindowClass *window_calss = GTK_WINDOW_CLASS (klass);
 
   gtk_widget_class_set_template_from_resource (widget_class, "/xyz/schaetzle/Fvfefvsc/fvfefvsc-window.ui");
   gtk_widget_class_bind_template_child (widget_class, FvfefvscWindow, header_bar);
@@ -57,6 +57,7 @@ fvfefvsc_window_init (FvfefvscWindow *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
   g_signal_connect_swapped (adw_tab_view_get_pages (self->tab_view), "items-changed", G_CALLBACK (show_pages), self);
+  g_signal_connect_swapped (self->tab_view, "notify::selected-page", G_CALLBACK (update_window), self);
 
   gtk_stack_set_visible_child (self->stack, GTK_WIDGET(self->welcome_page));
 }
@@ -66,4 +67,18 @@ show_pages (FvfefvscWindow *self)
 {
   g_assert(FVFEFVSC_IS_WINDOW (self));
   gtk_stack_set_visible_child (self->stack, GTK_WIDGET(self->pages));
+}
+
+static void
+update_window (FvfefvscWindow *self)
+{
+  g_assert(FVFEFVSC_IS_WINDOW (self));
+  g_debug ("In update_window");
+
+  AdwTabPage *selected_page;
+  AdwTabView *tab_view = self->tab_view;
+
+  selected_page = adw_tab_view_get_selected_page (tab_view);
+  self->visible_page = FVFEFVSC_PAGE (adw_tab_page_get_child (selected_page));
+  gtk_window_set_title (GTK_WINDOW(self), self->visible_page->title);
 }

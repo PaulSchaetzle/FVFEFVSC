@@ -27,7 +27,7 @@ G_BEGIN_DECLS
 
 #define FVFEFVSC_TYPE_PAGE (fvfefvsc_page_get_type())
 
-G_DECLARE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, FVFEFVSC, WIDGET, GtkWidget)
+G_DECLARE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, FVFEFVSC, PAGE, GtkWidget)
 
 struct _FvfefvscPage
 {
@@ -44,7 +44,7 @@ struct _FvfefvscPage
 
 void load_file(FvfefvscPage *self, GFile *file);
 void save_file(FvfefvscPage* self);
-void set_filepath(FvfefvscPage *self, gchar* file_path);
+void set_filepath(FvfefvscPage *self, GFile* file);
 FvfefvscPage * fvfefvsc_page_new(void);
 
 static void fvfefvsc_page_dispose (GObject *object);

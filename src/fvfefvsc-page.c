@@ -22,42 +22,37 @@
 
 #include "fvfefvsc-page.h"
 
-#include <glib.h>
-#include <glib/gstdio.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
 
 G_DEFINE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, GTK_TYPE_WIDGET)
 
 FvfefvscPage *
-fvfefvsc_page_new (void)
+fvfefvsc_page_new (void)  // Yet another workaround, will be fix once i figure out how to use properties
 {
-  return g_object_new(FVFEFVSC_TYPE_PAGE,
-                      NULL);
+  FvfefvscPage *new_page;
+
+  new_page = g_object_new(FVFEFVSC_TYPE_PAGE,
+                          NULL);
+  new_page->title = "New Document";
+  return new_page;
 }
 
 void
 load_file (FvfefvscPage *self, GFile *file)
 {
-  g_assert(FVFEFVSC_IS_WIDGET(self));
+  g_assert(FVFEFVSC_IS_PAGE(self));
   gchar *file_buffer;
-  gchar *title;
-  gchar *file_path;
   GtkTextBuffer *source_buffer = (GtkTextBuffer *) self->source_buffer;
 
-  file_path = g_file_get_path(file);
-  title = g_file_get_basename (file);
-  self->file_path = file_path;
-  self->title = title;
-  g_file_get_contents (file_path, &file_buffer, NULL, NULL);
+  set_filepath (self, file);
+  g_file_get_contents (self->file_path, &file_buffer, NULL, NULL);
   gtk_text_buffer_set_text(source_buffer, file_buffer, -1);
 }
 
 void
 save_file (FvfefvscPage* self)
 {
-  g_assert(FVFEFVSC_IS_WIDGET(self));
+  g_assert(FVFEFVSC_IS_PAGE(self));
   GtkTextBuffer *buffer = (GtkTextBuffer *) self->source_buffer;
   gchar *text;
   GtkTextIter start;
@@ -71,10 +66,16 @@ save_file (FvfefvscPage* self)
 }
 
 void
-set_filepath(FvfefvscPage *self, gchar *file_path)
+set_filepath(FvfefvscPage *self, GFile *file)
 {
-  g_assert(FVFEFVSC_IS_WIDGET(self));
+  g_assert(FVFEFVSC_IS_PAGE(self));
+  gchar *title;
+  gchar *file_path;
+
+  file_path = g_file_get_path(file);
+  title = g_file_get_basename (file);
   self->file_path = file_path;
+  self->title = title;
 }
 
 static void
@@ -107,5 +108,6 @@ static void
 fvfefvsc_page_dispose (GObject *object)
 {
   FvfefvscPage *self = (FvfefvscPage *) object;
+
   g_clear_pointer ((GtkWidget **)&self->box, gtk_widget_unparent);
 }
