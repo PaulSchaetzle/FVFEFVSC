@@ -40,6 +40,7 @@ fvfefvsc_page_new (void)
 void
 load_file (FvfefvscPage *self, GFile *file)
 {
+  g_assert(FVFEFVSC_IS_WIDGET(self));
   gchar *file_buffer;
   gchar *title;
   gchar *file_path;
@@ -56,6 +57,7 @@ load_file (FvfefvscPage *self, GFile *file)
 void
 save_file (FvfefvscPage* self)
 {
+  g_assert(FVFEFVSC_IS_WIDGET(self));
   GtkTextBuffer *buffer = (GtkTextBuffer *) self->source_buffer;
   gchar *text;
   GtkTextIter start;
@@ -65,11 +67,13 @@ save_file (FvfefvscPage* self)
   gtk_text_buffer_get_end_iter (buffer, &end);
   text = gtk_text_buffer_get_text (buffer, &start, &end, false);
   g_file_set_contents (self->file_path, text, -1, NULL);
+  gtk_text_buffer_set_modified (buffer, FALSE);
 }
 
 void
 set_filepath(FvfefvscPage *self, gchar *file_path)
 {
+  g_assert(FVFEFVSC_IS_WIDGET(self));
   self->file_path = file_path;
 }
 

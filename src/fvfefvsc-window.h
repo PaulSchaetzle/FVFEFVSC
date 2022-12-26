@@ -39,8 +39,12 @@ struct _FvfefvscWindow
   AdwTabView          *tab_view;
   AdwTabBar           *tab_bar;
   FvfefvscPage        *visible_page;
+  GtkStack            *stack;
+  GtkBox              *pages;
+  AdwStatusPage       *welcome_page;
 };
 
 void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
+static void show_pages(FvfefvscWindow *self);
 
 G_END_DECLS
