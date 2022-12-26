@@ -1,6 +1,6 @@
 /* fvfefvsc-window.h
  *
- * Copyright 2022 1000len-6578
+ * Copyright 2022 Paul Schaetzle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,33 @@
 
 #include <adwaita.h>
 
+#include "fvfefvsc-page.h"
+
 G_BEGIN_DECLS
 
 #define FVFEFVSC_TYPE_WINDOW (fvfefvsc_window_get_type())
 
 G_DECLARE_FINAL_TYPE (FvfefvscWindow, fvfefvsc_window, FVFEFVSC, WINDOW, AdwApplicationWindow)
+
+struct _FvfefvscWindow
+{
+  AdwApplicationWindow  parent_instance;
+
+  /* Template widgets */
+  GtkHeaderBar        *header_bar;
+  AdwTabView          *tab_view;
+  AdwTabBar           *tab_bar;
+  FvfefvscPage        *visible_page;
+  GtkStack            *stack;
+  GtkBox              *pages;
+  AdwStatusPage       *welcome_page;
+};
+
+// Callbacks
+static void show_pages(FvfefvscWindow *self);
+static void update_window (FvfefvscWindow *self);
+
+// Fvfefvsc-actions constructor call
+void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
 
 G_END_DECLS

@@ -4,3 +4,4 @@ data/xyz.schaetzle.fvfefvsc.gschema.xml
 src/main.c
 src/fvfefvsc-window.c
 src/fvfefvsc-window.ui
+src/fvfefvsc-actions.c

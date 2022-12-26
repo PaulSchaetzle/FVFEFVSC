@@ -2,11 +2,14 @@ fvfefvsc_sources = [
   'main.c',
   'fvfefvsc-application.c',
   'fvfefvsc-window.c',
+  'fvfefvsc-actions.c',
+  'fvfefvsc-page.c',
 ]
 
 fvfefvsc_deps = [
   dependency('gtk4'),
   dependency('libadwaita-1'),
+  dependency('gtksourceview-5'),
 ]
 
 fvfefvsc_sources += gnome.compile_resources('fvfefvsc-resources',

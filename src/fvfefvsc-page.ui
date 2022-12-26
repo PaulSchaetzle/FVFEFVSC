@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="GtkSource" version="5.0"/>
+  <template class="FvfefvscPage" parent="GtkWidget">
+    <child>
+      <object class="GtkBox" id="box">
+        <property name="orientation">vertical</property>
+          <child>
+            <object class="GtkScrolledWindow" id="scroller">
+              <property name="hexpand">true</property>
+              <property name="vexpand">true</property>
+                <child>
+                  <object class="GtkSourceView" id="source_view">
+                    <property name="show-line-numbers">true</property>
+                  </object>
+                </child>
+            </object>
+          </child>
+      </object>
+    </child>
+  </template>
+</interface>

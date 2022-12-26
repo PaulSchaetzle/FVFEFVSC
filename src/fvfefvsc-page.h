@@ -1,4 +1,4 @@
-/* fvfefvsc-application.h
+/* fvfefvsc-page.h
  *
  * Copyright 2022 Paul Schaetzle
  *
@@ -21,14 +21,33 @@
 #pragma once
 
 #include <adwaita.h>
+#include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
 
-#define FVFEFVSC_TYPE_APPLICATION (fvfefvsc_application_get_type())
+#define FVFEFVSC_TYPE_PAGE (fvfefvsc_page_get_type())
 
-G_DECLARE_FINAL_TYPE (FvfefvscApplication, fvfefvsc_application, FVFEFVSC, APPLICATION, AdwApplication)
+G_DECLARE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, FVFEFVSC, PAGE, GtkWidget)
 
-FvfefvscApplication *fvfefvsc_application_new (const char        *application_id,
-                                               GApplicationFlags  flags);
+struct _FvfefvscPage
+{
+  GtkWidget           parent_instance;
+
+  /* Template widgets */
+  GtkWidget           *box;
+  GtkScrolledWindow   *scroller;
+  GtkSourceView       *source_view;
+  GtkSourceBuffer     *source_buffer;
+  gchar               *file_path;
+  gchar               *title;
+};
+
+void load_file(FvfefvscPage *self, GFile *file);
+void save_file(FvfefvscPage* self);
+void set_filepath(FvfefvscPage *self, GFile* file);
+FvfefvscPage * fvfefvsc_page_new(void);
+
+static void fvfefvsc_page_dispose (GObject *object);
+
 
 G_END_DECLS
