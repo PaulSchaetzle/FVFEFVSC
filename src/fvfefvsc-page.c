@@ -34,16 +34,20 @@ fvfefvsc_page_new (void)  // Yet another workaround, will be fix once i figure o
   new_page = g_object_new(FVFEFVSC_TYPE_PAGE,
                           NULL);
   new_page->title = "New Document";
-  return new_page;
+  return g_steal_pointer (&new_page);
 }
 
 void
 load_file (FvfefvscPage *self, GFile *file)
 {
-  g_assert(FVFEFVSC_IS_PAGE(self));
-  gchar *file_buffer;
+  g_assert (FVFEFVSC_IS_PAGE(self));
+  g_assert (G_IS_FILE(file));
+  g_autofree gchar *file_buffer;
+  g_autofree gchar *uri;
   GtkTextBuffer *source_buffer = (GtkTextBuffer *) self->source_buffer;
 
+  uri = g_file_get_uri (file);
+  g_debug ("Load file from: %s", uri);
   set_filepath (self, file);
   g_file_get_contents (self->file_path, &file_buffer, NULL, NULL);
   gtk_text_buffer_set_text(source_buffer, file_buffer, -1);
@@ -52,7 +56,7 @@ load_file (FvfefvscPage *self, GFile *file)
 void
 save_file (FvfefvscPage* self)
 {
-  g_assert(FVFEFVSC_IS_PAGE(self));
+  g_assert (FVFEFVSC_IS_PAGE(self));
   GtkTextBuffer *buffer = (GtkTextBuffer *) self->source_buffer;
   gchar *text;
   GtkTextIter start;
@@ -68,7 +72,8 @@ save_file (FvfefvscPage* self)
 void
 set_filepath(FvfefvscPage *self, GFile *file)
 {
-  g_assert(FVFEFVSC_IS_PAGE(self));
+  g_assert (FVFEFVSC_IS_PAGE(self));
+  g_assert (G_IS_FILE(file));
   gchar *title;
   gchar *file_path;
 

@@ -22,26 +22,38 @@
 
 #include "fvfefvsc-window.h"
 
+void
+action_open_file (FvfefvscWindow *self,
+                  GFile          *file)
+{
+  AdwTabPage *tab_page;
+  g_assert (FVFEFVSC_IS_WINDOW (self));
+
+  self->visible_page = fvfefvsc_page_new ();
+  load_file(self->visible_page, file);
+  g_object_unref (file);
+  tab_page = adw_tab_view_append(self->tab_view, GTK_WIDGET(self->visible_page));
+  adw_tab_page_set_title(tab_page, self->visible_page->title);
+}
+
 static void
-action_open_response(FvfefvscWindow *self, int response, GtkFileChooserNative *native)
+action_open_response(FvfefvscWindow *self,
+                     int response,
+                     GtkFileChooserNative *native)
 {
  if (response == GTK_RESPONSE_ACCEPT)
     {
-      AdwTabPage *tab_page;
       GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
-
-      self->visible_page = fvfefvsc_page_new ();
-      load_file(self->visible_page, file);
-      g_object_unref (file);
-      tab_page = adw_tab_view_append(self->tab_view, GTK_WIDGET(self->visible_page));
-      adw_tab_page_set_title(tab_page, self->visible_page->title);
+      action_open_file(self, file);
     }
 
     gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
 }
 
 static void
-action_save_as_response(FvfefvscWindow *self, int response, GtkFileChooserNative *native)
+action_save_as_response(FvfefvscWindow *self,
+                        int response,
+                        GtkFileChooserNative *native)
 {
  if (response == GTK_RESPONSE_ACCEPT)
     {
@@ -58,7 +70,7 @@ action_save_as_response(FvfefvscWindow *self, int response, GtkFileChooserNative
     gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
 }
 
-static void
+void
 action_open (GtkWidget *widget,
              const char *action_name,
              GVariant *param)
@@ -77,7 +89,7 @@ action_open (GtkWidget *widget,
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
 
-static void
+void
 action_save_as (GtkWidget *widget,
                 const char *action_name,
                 GVariant   *param)
@@ -96,7 +108,7 @@ action_save_as (GtkWidget *widget,
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
 
-static void
+void
 action_save (GtkWidget *widget,
              const char *action_name,
              GVariant   *param)
@@ -115,7 +127,7 @@ action_save (GtkWidget *widget,
     }
 }
 
-static void
+void
 action_new (GtkWidget *widget,
             const char *action_name,
             GVariant *param)

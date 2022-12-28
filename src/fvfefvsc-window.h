@@ -42,13 +42,23 @@ struct _FvfefvscWindow
   GtkStack            *stack;
   GtkBox              *pages;
   AdwStatusPage       *welcome_page;
+  GtkDropTarget       *drop_target;
 };
 
 // Callbacks
 static void show_pages(FvfefvscWindow *self);
 static void update_window (FvfefvscWindow *self);
+static gboolean on_drop (GtkDropTarget *target,
+                         const GValue *value,
+                         double x,
+                         double y,
+                         gpointer data);
 
 // Fvfefvsc-actions constructor call
 void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
+
+void
+action_open_file (FvfefvscWindow *self,
+                  GFile          *file);
 
 G_END_DECLS
