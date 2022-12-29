@@ -30,7 +30,7 @@ fvfefvsc_window_class_init (FvfefvscWindowClass *klass)
 {
 
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  // GtkWindowClass *window_calss = GTK_WINDOW_CLASS (klass);
+  // GtkWindowClass *window_class = GTK_WINDOW_CLASS (klass);
 
   gtk_widget_class_set_template_from_resource (widget_class, "/xyz/schaetzle/Fvfefvsc/fvfefvsc-window.ui");
   gtk_widget_class_bind_template_child (widget_class, FvfefvscWindow, header_bar);
@@ -56,54 +56,13 @@ fvfefvsc_window_init (FvfefvscWindow *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  GType drop_types[1] = {G_TYPE_FILE};
-  self->drop_target = gtk_drop_target_new (G_TYPE_FILE, GDK_ACTION_COPY);
-  gtk_drop_target_set_gtypes (self->drop_target, drop_types, 1);
+  self->drop_target = gtk_drop_target_new (GDK_TYPE_FILE_LIST, GDK_ACTION_COPY);
 
-  g_signal_connect (self->drop_target, "drop", G_CALLBACK (on_drop), self);
-  g_signal_connect_swapped (adw_tab_view_get_pages (self->tab_view), "items-changed", G_CALLBACK (show_pages), self);
-  g_signal_connect_swapped (self->tab_view, "notify::selected-page", G_CALLBACK (update_window), self);
+  g_signal_connect (self->drop_target, "drop", G_CALLBACK (action_on_drop), self);
+  g_signal_connect_swapped (adw_tab_view_get_pages (self->tab_view), "items-changed", G_CALLBACK (action_show_pages), self);
+  g_signal_connect_swapped (self->tab_view, "notify::selected-page", G_CALLBACK (action_update_window), self);
 
   gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (self->drop_target));
 
   gtk_stack_set_visible_child (self->stack, GTK_WIDGET(self->welcome_page));
-}
-
-static void
-show_pages (FvfefvscWindow *self)
-{
-  g_assert(FVFEFVSC_IS_WINDOW (self));
-  gtk_stack_set_visible_child (self->stack, GTK_WIDGET(self->pages));
-}
-
-static void
-update_window (FvfefvscWindow *self)
-{
-  g_assert(FVFEFVSC_IS_WINDOW (self));
-
-  AdwTabPage *selected_page;
-  AdwTabView *tab_view = self->tab_view;
-
-  selected_page = adw_tab_view_get_selected_page (tab_view);
-  self->visible_page = FVFEFVSC_PAGE (adw_tab_page_get_child (selected_page));
-  gtk_window_set_title (GTK_WINDOW(self), self->visible_page->title);
-}
-
-static gboolean on_drop (GtkDropTarget *target,
-                         const GValue *value,
-                         double x,
-                         double y,
-                         gpointer data)
-{
-  FvfefvscWindow* self = (FvfefvscWindow*) data;
-  g_assert(FVFEFVSC_IS_WINDOW (self));
-
-  if (G_VALUE_HOLDS (value, G_TYPE_FILE))
-    {
-      action_open_file(self, g_value_get_object (value));
-    }
-  else
-    return FALSE;
-
-  return TRUE;
 }

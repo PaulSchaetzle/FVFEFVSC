@@ -46,9 +46,9 @@ struct _FvfefvscWindow
 };
 
 // Callbacks
-static void show_pages(FvfefvscWindow *self);
-static void update_window (FvfefvscWindow *self);
-static gboolean on_drop (GtkDropTarget *target,
+void action_show_pages(FvfefvscWindow *self);
+void action_update_window (FvfefvscWindow *self);
+gboolean action_on_drop (GtkDropTarget *target,
                          const GValue *value,
                          double x,
                          double y,
@@ -57,8 +57,7 @@ static gboolean on_drop (GtkDropTarget *target,
 // Fvfefvsc-actions constructor call
 void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
 
-void
-action_open_file (FvfefvscWindow *self,
-                  GFile          *file);
+void action_open_file (FvfefvscWindow *self,
+                       GFile          *file);
 
 G_END_DECLS

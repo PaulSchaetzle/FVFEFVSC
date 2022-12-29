@@ -23,6 +23,51 @@
 #include "fvfefvsc-window.h"
 
 void
+action_show_pages (FvfefvscWindow *self)
+{
+  g_assert(FVFEFVSC_IS_WINDOW (self));
+  gtk_stack_set_visible_child (self->stack, GTK_WIDGET(self->pages));
+}
+
+void
+action_update_window (FvfefvscWindow *self)
+{
+  g_assert(FVFEFVSC_IS_WINDOW (self));
+
+  AdwTabPage *selected_page;
+  AdwTabView *tab_view = self->tab_view;
+
+  selected_page = adw_tab_view_get_selected_page (tab_view);
+  self->visible_page = FVFEFVSC_PAGE (adw_tab_page_get_child (selected_page));
+  gtk_window_set_title (GTK_WINDOW(self), self->visible_page->title);
+}
+
+gboolean
+action_on_drop (GtkDropTarget *target,
+         const GValue *value,
+         double x,
+         double y,
+         gpointer data)
+{
+  FvfefvscWindow* self = (FvfefvscWindow*) data;
+  g_assert(FVFEFVSC_IS_WINDOW (self));
+
+  if (G_VALUE_HOLDS (value, GDK_TYPE_FILE_LIST))
+    {
+      GSList *list = g_value_get_boxed (value);
+
+      for (const GSList *iter = list; iter; iter = iter->next)
+        {
+          GFile *file = iter->data;
+          g_assert (G_IS_FILE (file));
+          action_open_file(self, file);
+        }
+      return TRUE;
+    }
+  return FALSE;
+}
+
+void
 action_open_file (FvfefvscWindow *self,
                   GFile          *file)
 {
@@ -43,10 +88,19 @@ action_open_response(FvfefvscWindow *self,
 {
  if (response == GTK_RESPONSE_ACCEPT)
     {
-      GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
-      action_open_file(self, file);
-    }
 
+      g_autoptr(GListModel) files = gtk_file_chooser_get_files (GTK_FILE_CHOOSER (native));
+      guint i = 0;
+      GFile *file = NULL;
+
+      g_assert (g_list_model_get_item_type (files) == G_TYPE_FILE);
+
+      while ((file = G_FILE (g_list_model_get_object (files, i++))))
+        {
+          action_open_file (self, file);
+          g_object_unref (file);
+        }
+    }
     gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
 }
 
@@ -85,6 +139,8 @@ action_open (GtkWidget *widget,
                                         GTK_FILE_CHOOSER_ACTION_OPEN,
                                         "_Open",
                                         "_Cancel");
+
+  gtk_file_chooser_set_select_multiple (GTK_FILE_CHOOSER (native), TRUE);
   g_signal_connect_object (native, "response", G_CALLBACK (action_open_response), self, G_CONNECT_SWAPPED);
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
