@@ -38,16 +38,29 @@ struct _FvfefvscPage
   GtkScrolledWindow   *scroller;
   GtkSourceView       *source_view;
   GtkSourceBuffer     *source_buffer;
-  gchar               *file_path;
-  gchar               *title;
+  GFile               *file;
 };
 
-void load_file(FvfefvscPage *self, GFile *file);
-void save_file(FvfefvscPage* self);
-void set_filepath(FvfefvscPage *self, GFile* file);
-FvfefvscPage * fvfefvsc_page_new(void);
-
+// GObject Functions
 static void fvfefvsc_page_dispose (GObject *object);
+static void fvfefvsc_page_finalize (GObject *object);
+static void fvfefvsc_page_set_properties (GObject *object,
+                                          guint property_id,
+                                          const GValue *value,
+                                          GParamSpec *pspec);
+
+static void fvfefvsc_page_get_properties (GObject *object,
+                                          guint property_id,
+                                          GValue *value,
+                                          GParamSpec *pspec);
+
+
+void load_file (FvfefvscPage *self);
+void save_file (FvfefvscPage* self);
+
+static gchar * get_file_name (FvfefvscPage *self);
+FvfefvscPage * fvfefvsc_page_new_for_file (GFile *file);
+FvfefvscPage * fvfefvsc_page_new_empty (void);
 
 
 G_END_DECLS

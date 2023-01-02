@@ -26,30 +26,40 @@
 
 G_DEFINE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, GTK_TYPE_WIDGET)
 
-FvfefvscPage *
-fvfefvsc_page_new (void)  // Yet another workaround, will be fix once i figure out how to use properties
+typedef enum
 {
-  FvfefvscPage *new_page;
+  PROP_FILE = 1,
+  PROP_TITLE,
+  N_PROPERTIES
+} FvfefvscPageProperty;
 
-  new_page = g_object_new(FVFEFVSC_TYPE_PAGE,
-                          NULL);
-  new_page->title = "New Document";
-  return g_steal_pointer (&new_page);
+static GParamSpec *object_properties[N_PROPERTIES] = {NULL, };
+
+FvfefvscPage *
+fvfefvsc_page_new_for_file (GFile *file)
+{
+  g_assert (G_IS_FILE (file));
+  return g_object_new (FVFEFVSC_TYPE_PAGE,
+                         "file", file,
+                         NULL);
+}
+
+FvfefvscPage *
+fvfefvsc_page_new_empty (void)
+{
+  return g_object_new (FVFEFVSC_TYPE_PAGE,
+                       NULL);
 }
 
 void
-load_file (FvfefvscPage *self, GFile *file)
+load_file (FvfefvscPage *self)
 {
   g_assert (FVFEFVSC_IS_PAGE(self));
-  g_assert (G_IS_FILE(file));
+  g_autofree gchar *file_path = g_file_get_path (self->file);
   g_autofree gchar *file_buffer;
-  g_autofree gchar *uri;
-  GtkTextBuffer *source_buffer = (GtkTextBuffer *) self->source_buffer;
+  GtkTextBuffer *source_buffer = GTK_TEXT_BUFFER (self->source_buffer);
 
-  uri = g_file_get_uri (file);
-  g_debug ("Load file from: %s", uri);
-  set_filepath (self, file);
-  g_file_get_contents (self->file_path, &file_buffer, NULL, NULL);
+  g_file_get_contents (file_path, &file_buffer, NULL, NULL);
   gtk_text_buffer_set_text(source_buffer, file_buffer, -1);
 }
 
@@ -57,30 +67,73 @@ void
 save_file (FvfefvscPage* self)
 {
   g_assert (FVFEFVSC_IS_PAGE(self));
-  GtkTextBuffer *buffer = (GtkTextBuffer *) self->source_buffer;
-  gchar *text;
+  GtkTextBuffer *source_buffer = GTK_TEXT_BUFFER (self->source_buffer);
+  g_autofree gchar *file_buffer;
+  g_autofree gchar *file_path = g_file_get_path (self->file);
   GtkTextIter start;
   GtkTextIter end;
 
-  gtk_text_buffer_get_start_iter (buffer, &start);
-  gtk_text_buffer_get_end_iter (buffer, &end);
-  text = gtk_text_buffer_get_text (buffer, &start, &end, false);
-  g_file_set_contents (self->file_path, text, -1, NULL);
-  gtk_text_buffer_set_modified (buffer, FALSE);
+  gtk_text_buffer_get_start_iter (source_buffer, &start);
+  gtk_text_buffer_get_end_iter (source_buffer, &end);
+  file_buffer = gtk_text_buffer_get_text (source_buffer, &start, &end, false);
+  g_file_set_contents (file_path, file_buffer, -1, NULL);
+  gtk_text_buffer_set_modified (source_buffer, FALSE);
 }
 
-void
-set_filepath(FvfefvscPage *self, GFile *file)
+static gchar *
+get_file_name (FvfefvscPage *self)
 {
-  g_assert (FVFEFVSC_IS_PAGE(self));
-  g_assert (G_IS_FILE(file));
-  gchar *title;
-  gchar *file_path;
+  g_assert (FVFEFVSC_IS_PAGE (self));
 
-  file_path = g_file_get_path(file);
-  title = g_file_get_basename (file);
-  self->file_path = file_path;
-  self->title = title;
+  if (self->file)
+    return g_file_get_basename (self->file);
+  return "New Document";
+}
+
+static void fvfefvsc_page_set_properties (GObject *object,
+                                          guint property_id,
+                                          const GValue *value,
+                                          GParamSpec *pspec)
+{
+  FvfefvscPage *self = FVFEFVSC_PAGE (object);
+  g_assert (FVFEFVSC_IS_PAGE (self));
+
+  switch ((FvfefvscPageProperty) property_id)
+    {
+    case PROP_FILE:
+      self->file = g_value_get_object (value);
+      break;
+
+    default:
+      /* We don't have any other property... */
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+      break;
+    }
+}
+
+static void fvfefvsc_page_get_properties (GObject *object,
+                                          guint property_id,
+                                          GValue *value,
+                                          GParamSpec *pspec)
+{
+  FvfefvscPage *self = FVFEFVSC_PAGE (object);
+  g_assert (FVFEFVSC_IS_PAGE (self));
+
+  switch ((FvfefvscPageProperty) property_id)
+    {
+    case PROP_FILE:
+      g_value_set_object (value, self->file);
+      break;
+
+    case PROP_TITLE:
+      g_value_set_string (value, get_file_name (self));
+      break;
+
+    default:
+      /* We don't have any other property... */
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+      break;
+    }
 }
 
 static void
@@ -90,6 +143,27 @@ fvfefvsc_page_class_init (FvfefvscPageClass *klass)
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
 
   object_class->dispose = fvfefvsc_page_dispose;
+  object_class->finalize = fvfefvsc_page_finalize;
+  object_class->set_property = fvfefvsc_page_set_properties;
+  object_class->get_property = fvfefvsc_page_get_properties;
+
+  object_properties[PROP_FILE] =
+    g_param_spec_object ("file",
+                         "File",
+                         "GFile representing the opened file",
+                         G_TYPE_FILE,
+                         G_PARAM_READWRITE);
+
+  object_properties[PROP_TITLE] =
+    g_param_spec_string ("file_name",
+                         "File Name",
+                         "Name of the File, used as title for the tab pages",
+                         NULL,
+                         G_PARAM_READABLE);
+
+  g_object_class_install_properties (object_class,
+                                     N_PROPERTIES,
+                                     object_properties);
 
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
   gtk_widget_class_set_template_from_resource (widget_class, "/xyz/schaetzle/Fvfefvsc/fvfefvsc-page.ui");
@@ -112,7 +186,23 @@ fvfefvsc_page_init (FvfefvscPage *self)
 static void
 fvfefvsc_page_dispose (GObject *object)
 {
-  FvfefvscPage *self = (FvfefvscPage *) object;
+  FvfefvscPage *self = FVFEFVSC_PAGE (object);
+  g_assert (FVFEFVSC_IS_PAGE (self));
 
   g_clear_pointer ((GtkWidget **)&self->box, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->scroller, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->source_view, gtk_widget_unparent);
+
+  g_clear_object (&self->source_buffer);
+
+  G_OBJECT_CLASS (fvfefvsc_page_parent_class)->dispose (object);
+}
+
+static void
+fvfefvsc_page_finalize (GObject *object)
+{
+  FvfefvscPage *self = FVFEFVSC_PAGE (object);
+  g_assert (FVFEFVSC_IS_PAGE (self));
+
+  G_OBJECT_CLASS (fvfefvsc_page_parent_class)->finalize (object);
 }
