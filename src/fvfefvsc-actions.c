@@ -43,7 +43,7 @@ action_on_selected_page_changed (FvfefvscWindow *self)
   selected_page = adw_tab_view_get_selected_page (self->tab_view);
   self->visible_page = FVFEFVSC_PAGE (adw_tab_page_get_child (selected_page));
   g_object_get (self->visible_page, "file_name", &title, NULL);
-  gtk_window_set_title (GTK_WINDOW(self), title);
+  gtk_window_set_title (GTK_WINDOW (self), title);
 }
 
 void
@@ -52,6 +52,8 @@ action_on_page_attached (FvfefvscWindow *self,
                          gint position,
                          AdwTabView *tab_view)
 {
+  g_assert (FVFEFVSC_IS_WINDOW (self));
+
   g_object_bind_property (adw_tab_page_get_child (tab_page), "file_name",
                           tab_page, "title",
                           G_BINDING_SYNC_CREATE);
@@ -64,7 +66,8 @@ action_on_drop (FvfefvscWindow *self,
                 double y,
                 GtkDropTarget *target)
 {
-  g_assert(FVFEFVSC_IS_WINDOW (self));
+  g_assert (FVFEFVSC_IS_WINDOW (self));
+  g_assert (GTK_IS_DROP_TARGET (target));
 
   if (G_VALUE_HOLDS (value, GDK_TYPE_FILE_LIST))
     {
@@ -74,7 +77,7 @@ action_on_drop (FvfefvscWindow *self,
         {
           GFile *file = iter->data;
           g_assert (G_IS_FILE (file));
-          action_open_file(self, file);
+          action_open_file (self, file);
         }
       return TRUE;
     }
@@ -89,17 +92,19 @@ action_open_file (FvfefvscWindow *self,
   g_assert (G_IS_FILE (file));
 
   self->visible_page = fvfefvsc_page_new_for_file (file);
-  load_file(self->visible_page);
+  load_file (self->visible_page);
   g_object_unref (file);
-  adw_tab_view_append(self->tab_view, GTK_WIDGET(self->visible_page));
+  adw_tab_view_append (self->tab_view, GTK_WIDGET(self->visible_page));
 }
 
 static void
-action_open_response(FvfefvscWindow *self,
-                     int response,
-                     GtkFileChooserNative *native)
+action_open_response (FvfefvscWindow *self,
+                      int response,
+                      GtkFileChooserNative *native)
 {
- if (response == GTK_RESPONSE_ACCEPT)
+  g_assert (FVFEFVSC_IS_WINDOW (self));
+
+  if (response == GTK_RESPONSE_ACCEPT)
     {
 
       g_autoptr(GListModel) files = gtk_file_chooser_get_files (GTK_FILE_CHOOSER (native));
@@ -118,13 +123,15 @@ action_open_response(FvfefvscWindow *self,
 }
 
 static void
-action_save_as_response(FvfefvscWindow *self,
-                        int response,
-                        GtkFileChooserNative *native)
+action_save_as_response (FvfefvscWindow *self,
+                         int response,
+                         GtkFileChooserNative *native)
 {
- if (response == GTK_RESPONSE_ACCEPT)
+  g_assert (FVFEFVSC_IS_WINDOW (self));
+
+  if (response == GTK_RESPONSE_ACCEPT)
     {
-      GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER(native));
+      GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER (native));
 
       g_object_set(self->visible_page,
                    "file", file,
@@ -136,15 +143,15 @@ action_save_as_response(FvfefvscWindow *self,
     gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
 }
 
-void
+static void
 action_open (GtkWidget *widget,
              const char *action_name,
              GVariant *param)
 {
   GtkFileChooserNative *native;
-  FvfefvscWindow *self = (FvfefvscWindow*) widget;
+  FvfefvscWindow *self = FVFEFVSC_WINDOW (widget);
 
-  g_assert(FVFEFVSC_WINDOW (self));
+  g_assert(FVFEFVSC_IS_WINDOW (self));
 
   native = gtk_file_chooser_native_new ("Open File",
                                         GTK_WINDOW (self),
@@ -157,15 +164,15 @@ action_open (GtkWidget *widget,
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
 
-void
+static void
 action_save_as (GtkWidget *widget,
                 const char *action_name,
                 GVariant   *param)
 {
   GtkFileChooserNative *native;
-  FvfefvscWindow *self = (FvfefvscWindow*) widget;
+  FvfefvscWindow *self = FVFEFVSC_WINDOW (widget);
 
-  g_assert(FVFEFVSC_WINDOW (self));
+  g_assert(FVFEFVSC_IS_WINDOW (self));
 
   native = gtk_file_chooser_native_new ("Open File",
                                         GTK_WINDOW (self),
@@ -176,22 +183,22 @@ action_save_as (GtkWidget *widget,
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
 
-void
+static void
 action_save (GtkWidget *widget,
              const char *action_name,
              GVariant   *param)
 {
-  FvfefvscWindow *self = (FvfefvscWindow*) widget;
+  FvfefvscWindow *self = FVFEFVSC_WINDOW (widget);
 
-  g_assert(FVFEFVSC_WINDOW (self));
+  g_assert(FVFEFVSC_IS_WINDOW (self));
 
   if (self->visible_page->file)
-      save_file(self->visible_page);
+      save_file (self->visible_page);
   else
-      action_save_as(GTK_WIDGET(self), NULL, NULL);   // Works for now, maybe implement cleaner later?
+      action_save_as (GTK_WIDGET (self), NULL, NULL);   // Works for now, maybe implement cleaner later?
 }
 
-void
+static void
 action_new (GtkWidget *widget,
             const char *action_name,
             GVariant *param)
@@ -201,11 +208,11 @@ action_new (GtkWidget *widget,
   g_assert(FVFEFVSC_WINDOW (self));
 
   self->visible_page = fvfefvsc_page_new_empty();
-  adw_tab_view_append(self->tab_view, GTK_WIDGET(self->visible_page));
+  adw_tab_view_append(self->tab_view, GTK_WIDGET (self->visible_page));
 }
 
 void
-_fvfefvsc_window_class_actions_init(FvfefvscWindowClass *klass)
+_fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 

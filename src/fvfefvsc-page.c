@@ -137,6 +137,30 @@ static void fvfefvsc_page_get_properties (GObject *object,
 }
 
 static void
+fvfefvsc_page_dispose (GObject *object)
+{
+  FvfefvscPage *self = FVFEFVSC_PAGE (object);
+  g_assert (FVFEFVSC_IS_PAGE (self));
+
+  g_clear_pointer ((GtkWidget **)&self->box, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->scroller, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->source_view, gtk_widget_unparent);
+
+  g_clear_object (&self->source_buffer);
+
+  G_OBJECT_CLASS (fvfefvsc_page_parent_class)->dispose (object);
+}
+
+static void
+fvfefvsc_page_finalize (GObject *object)
+{
+  FvfefvscPage *self = FVFEFVSC_PAGE (object);
+  g_assert (FVFEFVSC_IS_PAGE (self));
+
+  G_OBJECT_CLASS (fvfefvsc_page_parent_class)->finalize (object);
+}
+
+static void
 fvfefvsc_page_class_init (FvfefvscPageClass *klass)
 {
   GObjectClass   *object_class = G_OBJECT_CLASS (klass);
@@ -181,28 +205,4 @@ fvfefvsc_page_init (FvfefvscPage *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
   self->source_buffer = (GtkSourceBuffer *) gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->source_view));
-}
-
-static void
-fvfefvsc_page_dispose (GObject *object)
-{
-  FvfefvscPage *self = FVFEFVSC_PAGE (object);
-  g_assert (FVFEFVSC_IS_PAGE (self));
-
-  g_clear_pointer ((GtkWidget **)&self->box, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **)&self->scroller, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **)&self->source_view, gtk_widget_unparent);
-
-  g_clear_object (&self->source_buffer);
-
-  G_OBJECT_CLASS (fvfefvsc_page_parent_class)->dispose (object);
-}
-
-static void
-fvfefvsc_page_finalize (GObject *object)
-{
-  FvfefvscPage *self = FVFEFVSC_PAGE (object);
-  g_assert (FVFEFVSC_IS_PAGE (self));
-
-  G_OBJECT_CLASS (fvfefvsc_page_parent_class)->finalize (object);
 }

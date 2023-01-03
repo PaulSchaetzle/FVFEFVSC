@@ -45,10 +45,6 @@ struct _FvfefvscWindow
   GtkDropTarget       *drop_target;
 };
 
-// GObject Functions
-static void fvfefvsc_window_dispose (GObject *object);
-// static void fvfefvsc_window_finalize (GObject *object);
-
 // Callbacks
 void action_show_pages(FvfefvscWindow *self);
 void action_on_selected_page_changed (FvfefvscWindow *self);
@@ -57,8 +53,7 @@ gboolean action_on_drop (FvfefvscWindow *self,
                          double x,
                          double y,
                          GtkDropTarget *target);
-void
-action_on_page_attached (FvfefvscWindow *self,
+void action_on_page_attached (FvfefvscWindow *self,
                          AdwTabPage *tab_page,
                          gint position,
                          AdwTabView *tab_view);

@@ -26,6 +26,24 @@
 G_DEFINE_FINAL_TYPE (FvfefvscWindow, fvfefvsc_window, ADW_TYPE_APPLICATION_WINDOW)
 
 static void
+fvfefvsc_window_dispose (GObject *object)
+{
+  FvfefvscWindow *self = FVFEFVSC_WINDOW (object);
+  g_assert (FVFEFVSC_IS_WINDOW (self));
+
+  g_signal_handlers_disconnect_by_func (adw_tab_view_get_pages (self->tab_view), G_CALLBACK (action_show_pages), self);   // disconnect the signal so the callback wont be triggered by the destuction process
+
+  g_clear_pointer ((GtkWidget **)&self->welcome_page, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->pages, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->tab_bar, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->tab_view, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->stack, gtk_widget_unparent);
+  g_clear_pointer ((GtkWidget **)&self->header_bar, gtk_widget_unparent);
+
+  G_OBJECT_CLASS (fvfefvsc_window_parent_class)->dispose (object);
+}
+
+static void
 fvfefvsc_window_class_init (FvfefvscWindowClass *klass)
 {
 
@@ -70,29 +88,3 @@ fvfefvsc_window_init (FvfefvscWindow *self)
 
   gtk_stack_set_visible_child (self->stack, GTK_WIDGET (self->welcome_page));
 }
-
-static void
-fvfefvsc_window_dispose (GObject *object)
-{
-  FvfefvscWindow *self = FVFEFVSC_WINDOW (object);
-  g_assert (FVFEFVSC_IS_WINDOW (self));
-
-  g_signal_handlers_disconnect_by_func (adw_tab_view_get_pages (self->tab_view), G_CALLBACK (action_show_pages), self);   // disconnect the signal so the callback wont be triggered by the destuction process
-
-  g_clear_pointer ((GtkWidget **)&self->welcome_page, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **)&self->pages, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **)&self->tab_bar, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **)&self->tab_view, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **)&self->stack, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **)&self->header_bar, gtk_widget_unparent);
-
-  G_OBJECT_CLASS (fvfefvsc_window_parent_class)->dispose (object);
-}
-
-/*
-static void
-fvfefvsc_window_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (fvfefvsc_window_parent_class)->finalize (object);
-}
-*/
