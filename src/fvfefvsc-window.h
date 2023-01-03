@@ -46,20 +46,21 @@ struct _FvfefvscWindow
 };
 
 // Callbacks
-void action_show_pages(FvfefvscWindow *self);
-void action_on_selected_page_changed (FvfefvscWindow *self);
-gboolean action_on_drop (FvfefvscWindow *self,
+void action_show_pages_cb (FvfefvscWindow *self);
+void action_on_selected_page_changed_cb (FvfefvscWindow *self);
+gboolean action_on_drop_cb (FvfefvscWindow *self,
                          const GValue *value,
                          double x,
                          double y,
                          GtkDropTarget *target);
-void action_on_page_attached (FvfefvscWindow *self,
-                         AdwTabPage *tab_page,
-                         gint position,
-                         AdwTabView *tab_view);
+void action_on_page_attached_cb (FvfefvscWindow *self,
+                                 AdwTabPage *tab_page,
+                                 gint position,
+                                 AdwTabView *tab_view);
 
 // Fvfefvsc-actions constructor call
-void _fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
+void fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass);
+void fvfefvsc_window_dnd_init (FvfefvscWindow *self);
 
 void action_open_file (FvfefvscWindow *self,
                        GFile          *file);

@@ -1,4 +1,4 @@
-/* fvfefvsc-page.h
+/* fvfefvsc-application.c
  *
  * Copyright 2022 Paul Schaetzle
  *
@@ -20,31 +20,25 @@
 
 #pragma once
 
-#include <adwaita.h>
 #include <gtksourceview/gtksource.h>
-
-#include "fvfefvsc-buffer.h"
 
 G_BEGIN_DECLS
 
-#define FVFEFVSC_TYPE_PAGE (fvfefvsc_page_get_type())
+#define FVFEFVSC_TYPE_BUFFER (fvfefvsc_buffer_get_type())
 
-G_DECLARE_FINAL_TYPE (FvfefvscPage, fvfefvsc_page, FVFEFVSC, PAGE, GtkWidget)
+G_DECLARE_FINAL_TYPE (FvfefvscBuffer, fvfefvsc_buffer, FVFEFVSC, BUFFER, GtkSourceBuffer)
 
-struct _FvfefvscPage
+struct _FvfefvscBuffer
 {
-  GtkWidget           parent_instance;
+  GtkSourceBuffer     parent_instance;
 
-  /* Template widgets */
-  GtkWidget           *box;
-  GtkScrolledWindow   *scroller;
-  GtkSourceView       *view;
-  FvfefvscBuffer      *buffer;
-
-  gchar               *title;
+  GtkSourceFile       *file;
 };
 
-FvfefvscPage * fvfefvsc_page_new_for_buffer (FvfefvscBuffer *buffer);
-FvfefvscPage * fvfefvsc_page_new_empty (void);
+FvfefvscBuffer *fvfefvsc_buffer_new_for_file (GFile *file);
+FvfefvscBuffer *fvfefvsc_buffer_new (void);
+
+void fvfefvsc_buffer_load (FvfefvscBuffer *self);
+void fvfefvsc_buffer_save (FvfefvscBuffer *self);
 
 G_END_DECLS

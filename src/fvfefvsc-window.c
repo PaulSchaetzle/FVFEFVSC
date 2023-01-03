@@ -31,7 +31,7 @@ fvfefvsc_window_dispose (GObject *object)
   FvfefvscWindow *self = FVFEFVSC_WINDOW (object);
   g_assert (FVFEFVSC_IS_WINDOW (self));
 
-  g_signal_handlers_disconnect_by_func (adw_tab_view_get_pages (self->tab_view), G_CALLBACK (action_show_pages), self);   // disconnect the signal so the callback wont be triggered by the destuction process
+  g_signal_handlers_disconnect_by_func (adw_tab_view_get_pages (self->tab_view), G_CALLBACK (action_show_pages_cb), self);   // disconnect the signal so the callback wont be triggered by the destuction process
 
   g_clear_pointer ((GtkWidget **)&self->welcome_page, gtk_widget_unparent);
   g_clear_pointer ((GtkWidget **)&self->pages, gtk_widget_unparent);
@@ -69,7 +69,7 @@ fvfefvsc_window_class_init (FvfefvscWindowClass *klass)
 
   g_type_ensure(FVFEFVSC_TYPE_PAGE);
 
-  _fvfefvsc_window_class_actions_init (klass);  // intialize fvfefvsc-actions
+  fvfefvsc_window_class_actions_init (klass);  // intialize fvfefvsc-actions
 }
 
 static void
@@ -77,14 +77,11 @@ fvfefvsc_window_init (FvfefvscWindow *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  self->drop_target = gtk_drop_target_new (GDK_TYPE_FILE_LIST, GDK_ACTION_COPY);
-
-  g_signal_connect_swapped (self->drop_target, "drop", G_CALLBACK (action_on_drop), self);
-  g_signal_connect_swapped (adw_tab_view_get_pages (self->tab_view), "items-changed", G_CALLBACK (action_show_pages), self);
-  g_signal_connect_swapped (self->tab_view, "notify::selected-page", G_CALLBACK (action_on_selected_page_changed), self);
-  g_signal_connect_swapped (self->tab_view, "page-attached", G_CALLBACK (action_on_page_attached), self);
-
-  gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (self->drop_target));
+  g_signal_connect_swapped (adw_tab_view_get_pages (self->tab_view), "items-changed", G_CALLBACK (action_show_pages_cb), self);
+  g_signal_connect_swapped (self->tab_view, "notify::selected-page", G_CALLBACK (action_on_selected_page_changed_cb), self);
+  g_signal_connect_swapped (self->tab_view, "page-attached", G_CALLBACK (action_on_page_attached_cb), self);
 
   gtk_stack_set_visible_child (self->stack, GTK_WIDGET (self->welcome_page));
+
+  fvfefvsc_window_dnd_init (self);
 }

@@ -19,11 +19,10 @@
  */
 
 #include "config.h"
-
 #include "fvfefvsc-window.h"
 
 void
-action_show_pages (FvfefvscWindow *self)
+action_show_pages_cb (FvfefvscWindow *self)
 {
   g_assert (FVFEFVSC_IS_WINDOW (self));
   if (adw_tab_view_get_n_pages (self->tab_view) > 0)
@@ -33,80 +32,56 @@ action_show_pages (FvfefvscWindow *self)
 }
 
 void
-action_on_selected_page_changed (FvfefvscWindow *self)
+action_on_selected_page_changed_cb (FvfefvscWindow *self)
 {
   g_assert (FVFEFVSC_IS_WINDOW (self));
 
   AdwTabPage *selected_page;
-  g_autofree gchar *title;
 
   selected_page = adw_tab_view_get_selected_page (self->tab_view);
   self->visible_page = FVFEFVSC_PAGE (adw_tab_page_get_child (selected_page));
-  g_object_get (self->visible_page, "file_name", &title, NULL);
-  gtk_window_set_title (GTK_WINDOW (self), title);
 }
 
 void
-action_on_page_attached (FvfefvscWindow *self,
-                         AdwTabPage *tab_page,
-                         gint position,
-                         AdwTabView *tab_view)
+action_on_page_attached_cb (FvfefvscWindow *self,
+                            AdwTabPage *tab_page,
+                            gint position,
+                            AdwTabView *tab_view)
 {
   g_assert (FVFEFVSC_IS_WINDOW (self));
 
-  g_object_bind_property (adw_tab_page_get_child (tab_page), "file_name",
+  g_object_bind_property (adw_tab_page_get_child (tab_page), "title",
                           tab_page, "title",
                           G_BINDING_SYNC_CREATE);
-}
-
-gboolean
-action_on_drop (FvfefvscWindow *self,
-                const GValue *value,
-                double x,
-                double y,
-                GtkDropTarget *target)
-{
-  g_assert (FVFEFVSC_IS_WINDOW (self));
-  g_assert (GTK_IS_DROP_TARGET (target));
-
-  if (G_VALUE_HOLDS (value, GDK_TYPE_FILE_LIST))
-    {
-      GSList *list = g_value_get_boxed (value);
-
-      for (const GSList *iter = list; iter; iter = iter->next)
-        {
-          GFile *file = iter->data;
-          g_assert (G_IS_FILE (file));
-          action_open_file (self, file);
-        }
-      return TRUE;
-    }
-  return FALSE;
 }
 
 void
 action_open_file (FvfefvscWindow *self,
                   GFile          *file)
 {
+  FvfefvscPage *page = NULL;
+  FvfefvscBuffer *buffer = NULL;
   g_assert (FVFEFVSC_IS_WINDOW (self));
   g_assert (G_IS_FILE (file));
 
-  self->visible_page = fvfefvsc_page_new_for_file (file);
-  load_file (self->visible_page);
+  buffer = fvfefvsc_buffer_new_for_file (file);
+  page = fvfefvsc_page_new_for_buffer (buffer);
+
+  self->visible_page = page;
+  fvfefvsc_buffer_load (buffer);
   g_object_unref (file);
   adw_tab_view_append (self->tab_view, GTK_WIDGET(self->visible_page));
 }
 
 static void
-action_open_response (FvfefvscWindow *self,
-                      int response,
-                      GtkFileChooserNative *native)
+action_open_response_cb (FvfefvscWindow *self,
+                         int response,
+                         GtkFileChooserNative *native)
 {
   g_assert (FVFEFVSC_IS_WINDOW (self));
 
   if (response == GTK_RESPONSE_ACCEPT)
     {
-
       g_autoptr(GListModel) files = gtk_file_chooser_get_files (GTK_FILE_CHOOSER (native));
       guint i = 0;
       GFile *file = NULL;
@@ -123,22 +98,27 @@ action_open_response (FvfefvscWindow *self,
 }
 
 static void
-action_save_as_response (FvfefvscWindow *self,
-                         int response,
-                         GtkFileChooserNative *native)
+action_save_as_response_cb (FvfefvscWindow *self,
+                            int response,
+                            GtkFileChooserNative *native)
 {
   g_assert (FVFEFVSC_IS_WINDOW (self));
 
   if (response == GTK_RESPONSE_ACCEPT)
     {
       GFile *file =  gtk_file_chooser_get_file (GTK_FILE_CHOOSER (native));
+      FvfefvscBuffer *buffer;
+      g_object_get (self->visible_page,
+                    "buffer", &buffer,
+                    NULL);
 
-      g_object_set(self->visible_page,
-                   "file", file,
-                   NULL);
-      save_file(self->visible_page);
+      g_object_set (buffer,
+                    "file", file,
+                    NULL);
+
+      fvfefvsc_buffer_save (buffer);
       g_object_unref (file);
-      adw_tab_view_get_selected_page (self->tab_view);
+
     }
     gtk_native_dialog_destroy (GTK_NATIVE_DIALOG (native));
 }
@@ -160,7 +140,7 @@ action_open (GtkWidget *widget,
                                         "_Cancel");
 
   gtk_file_chooser_set_select_multiple (GTK_FILE_CHOOSER (native), TRUE);
-  g_signal_connect_object (native, "response", G_CALLBACK (action_open_response), self, G_CONNECT_SWAPPED);
+  g_signal_connect_object (native, "response", G_CALLBACK (action_open_response_cb), self, G_CONNECT_SWAPPED);
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
 
@@ -179,7 +159,7 @@ action_save_as (GtkWidget *widget,
                                         GTK_FILE_CHOOSER_ACTION_SAVE,
                                         "_Save",
                                         "_Cancel");
-  g_signal_connect_object (native, "response", G_CALLBACK (action_save_as_response), self, G_CONNECT_SWAPPED);
+  g_signal_connect_object (native, "response", G_CALLBACK (action_save_as_response_cb), self, G_CONNECT_SWAPPED);
   gtk_native_dialog_show (GTK_NATIVE_DIALOG (native));
 }
 
@@ -192,10 +172,11 @@ action_save (GtkWidget *widget,
 
   g_assert(FVFEFVSC_IS_WINDOW (self));
 
-  if (self->visible_page->file)
+/*  if (self->visible_page)
       save_file (self->visible_page);
   else
-      action_save_as (GTK_WIDGET (self), NULL, NULL);   // Works for now, maybe implement cleaner later?
+      action_save_as (GTK_WIDGET (self), NULL, NULL);  // Works for now, maybe implement cleaner later?
+*/
 }
 
 static void
@@ -203,16 +184,20 @@ action_new (GtkWidget *widget,
             const char *action_name,
             GVariant *param)
 {
+  FvfefvscPage *page = NULL;
+  FvfefvscBuffer *buffer = NULL;
   FvfefvscWindow *self = FVFEFVSC_WINDOW (widget);
-
   g_assert(FVFEFVSC_WINDOW (self));
 
-  self->visible_page = fvfefvsc_page_new_empty();
+  buffer = fvfefvsc_buffer_new ();
+  page = fvfefvsc_page_new_for_buffer (buffer);
+
+  self->visible_page = page;
   adw_tab_view_append(self->tab_view, GTK_WIDGET (self->visible_page));
 }
 
 void
-_fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass)
+fvfefvsc_window_class_actions_init (FvfefvscWindowClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
