@@ -42,9 +42,9 @@ struct _FvfefvscPage
   FvfefvscBuffer      *buffer;
 
   gchar               *title;
+  gboolean            is_draft;
 };
 
 FvfefvscPage * fvfefvsc_page_new_for_buffer (FvfefvscBuffer *buffer);
-FvfefvscPage * fvfefvsc_page_new_empty (void);
 
 G_END_DECLS

@@ -27,6 +27,7 @@ typedef enum
 {
   PROP_BUFFER = 1,
   PROP_TITLE,
+  PROP_IS_DRAFT,
   N_PROPERTIES
 } FvfefvscPageProperty;
 
@@ -56,6 +57,9 @@ fvfefvsc_page_set_buffer (FvfefvscPage *self,
       g_object_bind_property (self->buffer, "title",
                               self, "title",
                               G_BINDING_SYNC_CREATE);
+      g_object_set (self,
+                    "is_draft", FALSE,
+                    NULL);
     }
 }
 
@@ -75,6 +79,10 @@ static void fvfefvsc_page_set_properties (GObject *object,
 
     case PROP_TITLE:
       self->title = g_value_dup_string (value);
+      break;
+
+    case PROP_IS_DRAFT:
+      self->is_draft = g_value_get_boolean (value);
       break;
 
     default:
@@ -100,6 +108,10 @@ static void fvfefvsc_page_get_properties (GObject *object,
 
     case PROP_TITLE:
       g_value_set_string (value, self->title);
+      break;
+
+    case PROP_IS_DRAFT:
+      g_value_set_boolean (value, self->is_draft);
       break;
 
     default:
@@ -156,6 +168,13 @@ fvfefvsc_page_class_init (FvfefvscPageClass *klass)
                          "Title",
                          "Name of the File, used as title for the tab pages",
                          "New Document",
+                         G_PARAM_READWRITE);
+
+  object_properties[PROP_IS_DRAFT] =
+    g_param_spec_boolean ("is_draft",
+                         "is draft",
+                         "Marks the page as a draft meaning it has no associated file",
+                         TRUE,
                          G_PARAM_READWRITE);
 
   g_object_class_install_properties (object_class,
