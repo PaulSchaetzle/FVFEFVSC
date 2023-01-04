@@ -169,14 +169,20 @@ action_save (GtkWidget *widget,
              GVariant   *param)
 {
   FvfefvscWindow *self = FVFEFVSC_WINDOW (widget);
-
   g_assert(FVFEFVSC_IS_WINDOW (self));
 
-/*  if (self->visible_page)
-      save_file (self->visible_page);
+  gboolean is_draft;
+  FvfefvscBuffer *buffer;
+
+  g_object_get (self->visible_page,
+                "is_draft", &is_draft,
+                "buffer", &buffer,
+                NULL);
+
+  if (is_draft)
+    action_save_as (GTK_WIDGET (self), NULL, NULL);  // Works for now, maybe implement cleaner later?
   else
-      action_save_as (GTK_WIDGET (self), NULL, NULL);  // Works for now, maybe implement cleaner later?
-*/
+    fvfefvsc_buffer_save (buffer);
 }
 
 static void
