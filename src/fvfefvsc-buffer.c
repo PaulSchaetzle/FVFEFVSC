@@ -50,6 +50,29 @@ fvfefvsc_buffer_new (void)
 }
 
 static void
+fvfefvsc_buffer_set_syntax_hl (FvfefvscBuffer *self)
+{
+  g_assert (FVFEFVSC_IS_BUFFER (self));
+  GtkSourceLanguageManager *language_manager;
+  GtkSourceLanguage *language;
+  GFile *file;
+  g_autofree gchar *filename;
+
+  g_object_get (self,
+                "file",
+                &file, NULL);
+
+  filename = g_file_get_parse_name (file);
+
+  language_manager = gtk_source_language_manager_get_default ();
+  language = gtk_source_language_manager_guess_language (language_manager,
+                                                         filename,
+                                                         NULL);
+
+  gtk_source_buffer_set_language (GTK_SOURCE_BUFFER (self), language);
+}
+
+static void
 fvfefvsc_buffer_load_cb (GObject *source_object,
                          GAsyncResult* res,
                          gpointer user_data)
@@ -61,22 +84,7 @@ fvfefvsc_buffer_load_cb (GObject *source_object,
 
   if (gtk_source_file_loader_load_finish (loader, res, NULL))
     {
-      GtkSourceLanguageManager *language_manager;
-      GtkSourceLanguage *language;
-      GFile *file;
-      g_autofree gchar *filename;
-
-      g_object_get (self,
-                    "file",
-                    &file, NULL);
-
-      filename = g_file_get_parse_name (file);
-
-      language_manager = gtk_source_language_manager_get_default ();
-      language = gtk_source_language_manager_guess_language (language_manager,
-                                                             filename,
-                                                             NULL);
-      gtk_source_buffer_set_language (GTK_SOURCE_BUFFER (self), language);
+      fvfefvsc_buffer_set_syntax_hl (self);
     }
 }
 
@@ -107,6 +115,11 @@ fvfefvsc_buffer_save_cb (GObject *source_object,
   g_assert (FVFEFVSC_IS_BUFFER (self));
 
   g_object_notify_by_pspec (G_OBJECT (self), object_properties[PROP_TITLE]);
+
+  if (gtk_source_file_saver_save_finish (saver, res, NULL))
+    {
+      fvfefvsc_buffer_set_syntax_hl (self);
+    }
 }
 
 void
