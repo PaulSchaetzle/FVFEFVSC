@@ -84,4 +84,20 @@ fvfefvsc_window_init (FvfefvscWindow *self)
   gtk_stack_set_visible_child (self->stack, GTK_WIDGET (self->welcome_page));
 
   fvfefvsc_window_dnd_init (self);
+
+  GSettings *settings = g_settings_new ("xyz.schaetzle.fvfefvsc.State");
+
+  // update the settings when the properties change and vice versa
+  g_settings_bind (settings, "width",
+                   self, "default-width",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, "height",
+                   self, "default-height",
+                    G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, "is-maximized",
+                   self, "maximized",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, "is-fullscreen",
+                   self, "fullscreened",
+                   G_SETTINGS_BIND_DEFAULT);
 }
